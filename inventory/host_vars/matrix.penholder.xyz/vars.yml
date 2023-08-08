@@ -1,0 +1,5 @@
+
+server_name: "penholder.xyz"
+postgresql_password: "strong-redacted-password"
+matrix_admin_email: "perthchat@protonmail.com"
+registration_shared_secret: "strong-redacted-password"

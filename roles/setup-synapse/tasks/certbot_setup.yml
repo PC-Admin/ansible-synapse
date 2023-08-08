@@ -1,0 +1,34 @@
+
+- name: Install Certbot
+  apt:
+    name: certbot
+    state: present
+
+- name: Install Certbot Nginx Plugin
+  apt:
+    name: python3-certbot-nginx
+    state: present
+
+- name: Create TLS certificate
+  become: yes
+  become_user: root
+  command: certbot certonly --rsa-key-size 2048 -d {{ server_name }} -d element.{{ server_name }} -d turn.{{ server_name }} --agree-tos --non-interactive --email {{ matrix_admin_email }} --nginx
+
+- name: Setup SSL Auto-renewal
+  become: yes
+  become_user: root
+  cron:
+    name: certbot renew
+    minute: 0
+    hour: 0
+    day: 1
+    month: '*'
+    weekday: '*'
+    job: certbot renew --rsa-key-size 2048 --quiet --post-hook "systemctl reload nginx"
+
+- name: Create Diffie-Hellman key
+  become: yes
+  become_user: root
+  command:
+    cmd: openssl dhparam -out /etc/letsencrypt/live/{{ server_name }}/dhparam2048.pem 2048
+    creates: /etc/letsencrypt/live/{{ server_name }}/dhparam2048.pem

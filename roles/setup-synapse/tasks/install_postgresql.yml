@@ -1,0 +1,39 @@
+---
+- name: Install Postgresql
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - postgresql
+    - postgresql-client
+
+- name: Ensure pip is installed
+  apt:
+    name: python3-pip
+    state: present
+
+- name: Install psycopg2 with pip
+  pip:
+    name: psycopg2-binary
+    state: present
+    extra_args: "{{ (ansible_distribution == 'Debian' and ansible_distribution_version is version('12', '>=')) | ternary('--break-system-packages', '') }}"
+
+- name: Create Synapse role in PostgreSQL
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: synapse
+    password: "{{ postgresql_password }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB,NOCREATEROLE
+    encrypted: yes
+
+- name: Create Database for Synapse
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: synapse
+    encoding: UTF8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+    owner: synapse

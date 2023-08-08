@@ -1,0 +1,7 @@
+
+- name: "Creates a basic Synapse server."
+  hosts: matrix_servers
+  gather_facts: true
+
+  roles:
+    - setup-synapse

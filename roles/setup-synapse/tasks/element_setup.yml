@@ -1,0 +1,112 @@
+---
+- name: Template NGINX config for Element
+  become: yes
+  template:
+    src: "{{ role_path }}/templates/nginx-element.conf.j2"
+    dest: "/etc/nginx/sites-available/element.{{ server_name}}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Nginx
+
+- name: Create symbolic link for NGINX config
+  become: yes
+  file:
+    src: /etc/nginx/sites-available/element.{{ server_name}}.conf
+    dest: /etc/nginx/sites-enabled/element.{{ server_name}}.conf
+    state: link
+    force: yes
+
+- name: Create the /var/www/element.penholder.xyz/ directory
+  become: yes
+  file:
+    path: "/var/www/element.{{ server_name}}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download and install latest Element
+  become: yes
+  block:
+
+    - name: Install GPG
+      apt:
+        name: gnupg
+        state: present
+
+    - name: Copy Element release key to /tmp
+      copy:
+        src: "{{ playbook_dir }}/pubkey/element-release-key.gpg"
+        dest: /tmp/element-release-key.gpg
+        mode: '0644'
+
+    # need to install GPG key from https://packages.element.io/element-release-key.gpg
+
+    - name: Import Element release key
+      shell: gpg --import /tmp/element-release-key.gpg
+    
+    - name: Download Element archive
+      get_url:
+        url: "https://github.com/vector-im/element-web/releases/download/v1.11.38/element-v1.11.38.tar.gz"
+        dest: "/tmp/element-v1.11.38.tar.gz"
+
+    - name: Download Element archive signature
+      get_url:
+        url: "https://github.com/vector-im/element-web/releases/download/v1.11.38/element-v1.11.38.tar.gz.asc"
+        dest: "/tmp/element-v1.11.38.tar.gz.asc"
+
+    - name: Verify Element archive signature
+      shell: gpg --verify /tmp/element-v1.11.38.tar.gz.asc /tmp/element-v1.11.38.tar.gz
+      args:
+        chdir: "/tmp"
+    
+    - name: Extract Element archive
+      unarchive:
+        src: "/tmp/element-v1.11.38.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+      args:
+        creates: "/var/www/element.{{ server_name}}/element-v1.11.38"
+
+# Copy
+# /tmp/element-v1.11.38/*
+# /var/www/element.penholder.xyz/
+
+    - name: Copy Element files to web directory
+      shell: cp -r /tmp/element-v1.11.38/* /var/www/element.{{ server_name}}
+      args:
+        creates: "/var/www/element.{{ server_name}}/welcome.html"
+
+    - name: Clean up downloaded files
+      file:
+        path: "/tmp/element-v*"
+        state: absent
+
+    - name: Template the Element Config file
+      template:
+        src: "{{ role_path }}/templates/element.json.j2"
+        dest: "/var/www/element.{{ server_name}}/config.json"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Nginx
+
+# - name: Create and edit config.json for Element
+#   become: yes
+#   blockinfile:
+#     path: "/var/www/element.{{ server_name}}/config.json"
+#     create: yes
+#     content: |
+#       {
+#           "default_server_config": {
+#               "m.homeserver": {
+#                   "base_url": "https://{{ server_name}}",
+#                   "server_name": "{{ server_name}}"
+#               },
+#               "m.identity_server": {
+#                   "base_url": "https://vector.im"
+#               }
+#           },
+#           # ... (other config options)
+#       }

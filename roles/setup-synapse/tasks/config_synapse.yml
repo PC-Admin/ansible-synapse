@@ -1,0 +1,37 @@
+---
+- name: Apply the homeserver.yaml template
+  template:
+    src: templates/homeserver.yaml.j2
+    dest: /etc/matrix-synapse/homeserver.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Apply the nginx.conf template
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/sites-available/matrix
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable the nginx site
+  file:
+    src: /etc/nginx/sites-available/matrix
+    dest: /etc/nginx/sites-enabled/matrix
+    state: link
+
+- name: Remove the default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Restart Nginx
+
+- name: Set Synapse Cache Factor
+  lineinfile:
+    path: /etc/default/matrix-synapse
+    regexp: '^SYNAPSE_CACHE_FACTOR='
+    line: 'SYNAPSE_CACHE_FACTOR=2.0'
+    state: present
+    create: yes
+  notify: Restart Synapse

@@ -1,0 +1,31 @@
+server_name: "{{ server_name }}"
+pid_file: "/var/run/matrix-synapse.pid"
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['::1', '127.0.0.1']
+    resources:
+      - names: [client, federation]
+        compress: false
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: "{{ postgresql_password }}"
+    database: synapse
+    host: localhost
+    cp_min: 5
+    cp_max: 10
+log_config: "/etc/matrix-synapse/log.yaml"
+media_store_path: "/var/lib/matrix-synapse/media"
+signing_key_path: "/etc/matrix-synapse/homeserver.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"
+web_client_location: "https://element.{{ server_name }}/"
+federation_client_minimum_tls_version: 1.2
+allow_public_rooms_over_federation: true
+enable_registration: false
+admin_contact: "mailto:{{ matrix_admin_email }}"
+registration_shared_secret: "{{ registration_shared_secret }}"

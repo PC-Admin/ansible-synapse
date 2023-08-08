@@ -1,0 +1,83 @@
+---
+# sudo apt update
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+#sudo apt install -y lsb-release wget apt-transport-https
+
+- name: Install Prerequisite Packages 
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - lsb-release
+    - wget
+    - apt-transport-https
+
+#sudo wget -O /usr/share/keyrings/matrix-org-archive-keyring.gpg https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
+
+#echo "deb [signed-by=/usr/share/keyrings/matrix-org-archive-keyring.gpg] https://packages.matrix.org/debian/ $(lsb_release -cs) main" |
+#    sudo tee /etc/apt/sources.list.d/matrix-org.list
+
+- name: Download Matrix.org GPG keyring
+  get_url:
+    url: https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
+    dest: /usr/share/keyrings/matrix-org-archive-keyring.gpg
+    mode: '0644'
+
+- name: Add Matrix.org repository
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/matrix-org-archive-keyring.gpg] https://packages.matrix.org/debian/ {{ ansible_distribution_release }} main
+    state: present
+
+#sudo apt update
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+#sudo apt install matrix-synapse-py3
+
+- name: Install Synapse
+  apt:
+    name: matrix-synapse-py3
+    state: present
+
+# sudo systemctl stop matrix-synapse
+
+- name: Stop Synapse
+  service:
+    name: matrix-synapse
+    state: stopped
+
+- name: Ensure /var/lib/matrix-synapse/media directory exists
+  file:
+    path: /var/lib/matrix-synapse/media
+    state: directory
+    owner: matrix-synapse
+    group: matrix-synapse
+    mode: '0755'
+
+- name: Add server_name to /etc/matrix-synapse/conf.d/server_name.yaml file
+  lineinfile:
+    path: /etc/matrix-synapse/conf.d/server_name.yaml
+    regexp: '^server_name:.*'
+    line: "server_name: {{ server_name }}"
+    create: yes
+    owner: root
+    group: root
+    mode: '0644'
+
+# Write "{{ registration_shared_secret }}" to /etc/matrix-synapse/conf.d/registration_shared_secret.yaml
+
+- name: Write registration_shared_secret to /etc/matrix-synapse/conf.d/registration_shared_secret.yaml
+  lineinfile:
+    path: /etc/matrix-synapse/conf.d/registration_shared_secret.yaml
+    regexp: '^registration_shared_secret:.*'
+    line: "registration_shared_secret: {{ registration_shared_secret }}"
+    create: yes
+    owner: root
+    group: root
+    mode: '0644'

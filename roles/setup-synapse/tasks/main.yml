@@ -1,0 +1,19 @@
+
+# Install Synapse
+- import_tasks: "{{ role_path }}/tasks/install_synapse.yml"
+
+# Install Postgresql
+- import_tasks: "{{ role_path }}/tasks/install_postgresql.yml"
+
+# Certbot Setup
+- import_tasks: "{{ role_path }}/tasks/certbot_setup.yml"
+
+# Configure Nginx
+- import_tasks: "{{ role_path }}/tasks/config_nginx.yml"
+
+# Configure Synapse
+- import_tasks: "{{ role_path }}/tasks/config_synapse.yml"
+
+# Install Element Web
+- import_tasks: "{{ role_path }}/tasks/element_setup.yml"
+  tags: install-element
