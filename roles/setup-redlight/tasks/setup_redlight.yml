@@ -52,9 +52,9 @@
     path: /etc/matrix-synapse/homeserver.yaml
     block: |
       modules:
-        - module: hello_world_module.HelloWorldModule
+        - module: redlight_client_module.RedlightClientModule
           config: {}  # No specific configuration for this module
-        - module: abuse_lookup_module.AbuseLookupModule
+        - module: redlight_server_module.RedlightServerModule
           config: {}
     state: present
     owner: root
