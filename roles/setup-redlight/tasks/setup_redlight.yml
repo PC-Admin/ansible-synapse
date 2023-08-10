@@ -1,0 +1,63 @@
+
+- name: Ensure /opt/synapse_modules directory exists
+  file:
+    path: /opt/synapse_modules
+    state: directory
+    owner: matrix-synapse
+    group: matrix-synapse
+    mode: '0755'
+
+- name: Add PYTHONPATH to /lib/systemd/system/matrix-synapse.service file
+  lineinfile:
+    path: /lib/systemd/system/matrix-synapse.service
+    insertafter: "^[Service]"
+    regexp: '^Environment="PYTHONPATH=.*'
+    line: 'Environment="PYTHONPATH=$PYTHONPATH:/opt/synapse_modules"'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Ensure rsync is installed
+  apt:
+    name: rsync
+    state: present
+
+- name: Clone redlight module to /tmp
+  git:
+    repo: https://code.glowers.club/PC-Admin/redlight.git
+    dest: /tmp/redlight
+    version: main
+    force: yes
+
+- name: Synchronize /tmp/redlight content to /opt/synapse_modules/
+  synchronize:
+    src: /tmp/redlight/
+    dest: /opt/synapse_modules/
+    delete: yes
+
+- name: Change ownership of /opt/synapse_modules/
+  file:
+    path: /opt/synapse_modules/
+    owner: matrix-synapse
+    group: matrix-synapse
+    recurse: yes
+    state: directory
+
+- name: Add modules to homeserver.yaml
+  blockinfile:
+    path: /etc/matrix-synapse/homeserver.yaml
+    block: |
+      modules:
+        - module: hello_world_module.HelloWorldModule
+          config: {}  # No specific configuration for this module
+        - module: abuse_lookup_module.AbuseLookupModule
+          config: {}
+    state: present
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Synapse

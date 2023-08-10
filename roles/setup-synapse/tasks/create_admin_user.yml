@@ -1,0 +1,4 @@
+
+- name: Create Testing User
+  shell: |
+    sudo -u matrix-synapse python3 /opt/venvs/matrix-synapse/lib/python3.11/site-packages/synapse/_scripts/register_new_matrix_user.py -c /etc/matrix-synapse/homeserver.yaml http://localhost:8008 --user {{ testing_user.username }} --password {{ testing_user.password }}

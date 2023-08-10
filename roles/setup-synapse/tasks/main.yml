@@ -17,3 +17,7 @@
 # Install Element Web
 - import_tasks: "{{ role_path }}/tasks/element_setup.yml"
   tags: install-element
+
+# Create Admin User
+- import_tasks: "{{ role_path }}/tasks/create_admin_user.yml"
+  tags: create-admin-user

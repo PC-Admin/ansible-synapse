@@ -3,3 +3,9 @@ server_name: "snowsupport.top"
 postgresql_password: "strong-redacted-password"
 matrix_admin_email: "perthchat@protonmail.com"
 registration_shared_secret: "strong-redacted-password"
+
+testing_user: {
+    "username": "newuser2657",
+    "password": "strong-redacted-password",
+    "admin": True
+}

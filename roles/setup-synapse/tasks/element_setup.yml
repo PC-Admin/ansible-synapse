@@ -3,7 +3,7 @@
   become: yes
   template:
     src: "{{ role_path }}/templates/nginx-element.conf.j2"
-    dest: "/etc/nginx/sites-available/element.{{ server_name}}.conf"
+    dest: "/etc/nginx/sites-available/element"
     owner: root
     group: root
     mode: '0644'
@@ -12,8 +12,8 @@
 - name: Create symbolic link for NGINX config
   become: yes
   file:
-    src: /etc/nginx/sites-available/element.{{ server_name}}.conf
-    dest: /etc/nginx/sites-enabled/element.{{ server_name}}.conf
+    src: /etc/nginx/sites-available/element
+    dest: /etc/nginx/sites-enabled/element
     state: link
     force: yes
 
