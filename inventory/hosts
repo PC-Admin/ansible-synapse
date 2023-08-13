@@ -1,4 +1,5 @@
 
 [matrix_servers]
 #matrix.penholder.xyz ansible_host=matrix.penholder.xyz ansible_ssh_user=root
-matrix.snowsupport.top ansible_host=matrix.snowsupport.top ansible_ssh_user=root
+#matrix.snowsupport.top ansible_host=matrix.snowsupport.top ansible_ssh_user=root
+matrix.duckdomain.xyz ansible_host=matrix.duckdomain.xyz ansible_ssh_user=root

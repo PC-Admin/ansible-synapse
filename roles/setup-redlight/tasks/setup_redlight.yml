@@ -26,7 +26,8 @@
     name: rsync
     state: present
 
-- name: Clone redlight module to /tmp
+- name: Clone redlight module to /tmp to ansible controller
+  delegate_to: localhost
   git:
     repo: https://code.glowers.club/PC-Admin/redlight.git
     dest: /tmp/redlight
@@ -53,7 +54,8 @@
     block: |
       modules:
         - module: redlight_client_module.RedlightClientModule
-          config: {}  # No specific configuration for this module
+          config:
+            redlight_url: "https://{{ server_name }}/_matrix/loj/v1/abuse_lookup"
         - module: redlight_server_module.RedlightServerModule
           config: {}
     state: present

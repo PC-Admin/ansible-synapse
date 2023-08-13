@@ -1,0 +1,11 @@
+
+server_name: "duckdomain.xyz"
+postgresql_password: "strong-redacted-password"
+matrix_admin_email: "perthchat@protonmail.com"
+registration_shared_secret: "strong-redacted-password"
+
+testing_user: {
+    "username": "newuser2500",
+    "password": "strong-redacted-password",
+    "admin": True
+}

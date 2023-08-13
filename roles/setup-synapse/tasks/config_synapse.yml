@@ -27,11 +27,9 @@
     state: absent
   notify: Restart Nginx
 
-# - name: Set Synapse Cache Factor
-#   lineinfile:
-#     path: /etc/default/matrix-synapse
-#     regexp: '^SYNAPSE_CACHE_FACTOR='
-#     line: 'SYNAPSE_CACHE_FACTOR=2.0'
-#     state: present
-#     create: yes
-#   notify: Restart Synapse
+- name: Ensure Synapse is running
+  service:
+    name: matrix-synapse
+    state: started
+    enabled: yes
+  notify: Restart Synapse
