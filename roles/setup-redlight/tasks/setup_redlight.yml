@@ -55,7 +55,10 @@
       modules:
         - module: redlight_client_module.RedlightClientModule
           config:
-            redlight_url: "https://{{ server_name }}/_matrix/loj/v1/abuse_lookup"
+            homeserver_url: "https://{{ server_name }}"
+            redlight_bot_token: "{{ redlight_bot_token }}"
+            redlight_alert_room: "{{ redlight_alert_room }}"
+            redlight_server: "https://{{ server_name }}/_matrix/loj/v1/abuse_lookup"
         - module: redlight_server_module.RedlightServerModule
           config: {}
     state: present
