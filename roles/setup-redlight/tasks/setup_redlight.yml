@@ -60,7 +60,11 @@
             redlight_alert_room: "{{ redlight_alert_room }}"
             redlight_server: "https://{{ server_name }}/_matrix/loj/v1/abuse_lookup"
         - module: redlight_server_module.RedlightServerModule
-          config: {}
+          config:
+            source_repo_url: "https://code.glowers.club/api/v1/repos/testing-org/rdlist"
+            git_token: "{{ git_token }}"
+            source_list_file_path: "dist/summaries.json"
+            filtered_tags = ["csam", "anarchy"]
     state: present
     owner: root
     group: root
