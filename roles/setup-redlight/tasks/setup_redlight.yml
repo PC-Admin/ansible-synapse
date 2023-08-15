@@ -59,6 +59,7 @@
             redlight_alert_bot_token: "{{ redlight_bot_token }}"
             redlight_alert_room: "{{ redlight_alert_room }}"
             redlight_server: "https://{{ server_name }}/_matrix/loj/v1/abuse_lookup"
+            redlight_api_token: "{{ redlight_api_token }}"
         - module: redlight_server_module.RedlightServerModule
           config:
             source_repo_url: "https://code.glowers.club/api/v1/repos/testing-org/rdlist"
