@@ -66,9 +66,29 @@
             redlight_git_token: "{{ redlight_git_token }}"
             redlight_source_list_file_path: "dist/summaries.json"
             redlight_client_tokens: "{{ redlight_client_tokens }}"
-            redlight_filtered_tags: "{{ redlight_filtered_tags }}"
+            redlight_filtered_tags: {{ redlight_filtered_tags }}
     state: present
     owner: root
     group: root
     mode: '0644'
   notify: Restart Synapse
+
+- name: Create matrix_redlight role in PostgreSQL
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: matrix_redlight
+    password: "{{ redlight_postgresql_password }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB,NOCREATEROLE
+    encrypted: yes
+
+- name: Create Database for matrix_redlight
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: matrix_redlight
+    encoding: UTF8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+    owner: matrix_redlight
